@@ -1,6 +1,1 @@
-Verrà inserito un file .toml
-Sto creando nuovi "rami", proprio per evitare la confusione tra i diversi programmi provati e tentati per imparare Rust, poichè per natura, Rust non permette di cambiare il nome del file da "main.rs".
-
-In questo "ramo" ho anticipato alcune comandi basilari della libreria "random".
-
-Da notare che in questo caso è molto importante avere il file ".toml" che viene allegato e generato direttamente nella cartella da Rust
+In questo file vengono provate diverse iterazioni, come loop{}, si prova a creare un do{}while(), che in rust non esiste e gli if. Inoltre nel programma si và a risolvere un problema per cui il casting viene APPOSITAMENTE CREATO per fare STRINGA a INTERO. Questo perchè l'inserimento, almeno al momento, è tramite STRINGA. Quindi alla lettura non riuscirebbe a fare anche la lettura (in teoria)
