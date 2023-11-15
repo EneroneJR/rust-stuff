@@ -1,0 +1,12 @@
+ATTENZIONE! I file generati al momento sono dei Main di tipo VOID. Ovvero che non ritornano nulla. Per questo non ci sarà un effetivo "Return 0;" ad esempio.
+
+Per fare main che ritornano qualcosa...
+
+fn main()-> <type>
+
+esempio:
+
+fn main()-> i32
+{
+  return 0;
+}
