@@ -1,76 +1,132 @@
-/* se nel use ci servono più rami/path di librerie. come Input e Output, ma anche "Ordering" possiamo fare...
-
-    use rand::Rng;
-    use std::io;
-    use std::cmp::Ordering;
-
-    Ma personalmente preferirei:
-*/
 use std::{
     cmp::Ordering,
-    io, // nota che usi dentro le {}, la "," (virgola), non il punto e virgola.
+    io,
+    io::Write, // nota che usi dentro le {}, la "," (virgola), non il punto e virgola.
 }; // ricordarti sempre di finire con un ";"
 use rand::Rng;
 
-// Ordering è un enumerazione che contiene solo questi 3 valori:
-/*
-enum Ordering {
-    Less,
-    Equal,
-    Greater,
-} minore, uguale e maggiore
-
-*/
 fn main() 
 {
+    println!("Generando il numero da indovinare...");
     let mut rng = rand::thread_rng(); // genera una variabile di tipo Rng che si occupa di generare un numero casuale richiamandola con .gen_range("0..N-1")
     let n = rng.gen_range(1..101); // richiamo la variabilke rng con il metodo .gen_range("1..101") che genera un numero casuale tra 1 a 100
-    let mut input = String::new(); // stringa vuota da riempire con l'input	da indovinare
-    io::stdin().read_line(&mut input).unwrap();
 
-    // con ordering abbiamo la funzione "match"
-   /*match input.cmp(&n) { // cmp è un abbreviazione di "compare"/"comparare"
-        Ordering::Less => println!("Troppo piccolo"),
-        Ordering::Equal => println!("Uguale! hai vinto!"),
-        Ordering::Greater => println!("Troppo grande"),
-    }*/
-    // problema: input è una stringa e non un numero. Mentre rng è un numero
+    //let mut input = String::new(); // stringa vuota da riempire con l'input	da indovinare. ~~proviamo senza prendere in input una stringa~~
+    // fare una variabile in input qui è superfluo visto che serve dentro al loop
 
-    // come risolvere?
-    // Rust è capace di comparare non solo gli interi, ma TUTTI gli oggetti che hanno determinati caratteristiche! 
-    // Questo attraverso le "trait", ma questo si approfondisce su un altro programma.
+    // ATTENZIONE! FARE QUESTO CREA ERRORE DURANTE IL CODICE! QUELLO SOPRA! LET MUT INPUT = String::new();!!!. I CODICI APPUNTATI SENZA SPIEGAZIONE SONO CIÒ CHE CAUSAVA L'ERRORE!
 
-    /* Rust ha diversi tipi di intero:
-     i8 ovvero intero col segno a 8 bit: -128 a 127 ( da i8::Min a i8::Max ) SFRUTTA IL COMPLEMENTO A 2!
-     u8 intero senza segno a 8 bit: 0 a 255 ( da 0 a u8::MAX)
-     i16 intero col segno a 16 bit: -32768 a 32767 ( da i16::MIN a i16::MAX )
-     u16 intero senza segno a 16 bit: 0 a 65535 ( da 0 a u16::MAX)
-     i32 intero col segno a 32 bit: -2147483648 a 2147483647 ( da i32::MIN a i32::MAX )
-     u32 intero senza segno a 32 bit: 0 a 4294967295 ( da 0 a u32::MAX)
-     i64 intero col segno a 64 bit: -9223372036854775808 a 9223372036854775807 ( da i64::MIN a i64::MAX )
-     u64 intero senza segno a 64 bit: 0 a 18446744073709551615 ( da 0 a u64::MAX)
-     isize intero con segno, stessa dimensione dei puntatori per l'architettura corrente (usati magari per array)
-     usize intero senza segno, stessa dimensione dei puntatori per l'architettura corrente (usati magari per displacement di array)
-    */
+    println!("per motivi di test il valore generato è: {}", n);
+    loop //loop porta ad un iteerazione che puo' uscire solo se ci sarà un break. Per questo è un iterazione non consigliata
+    {
+        print!("Inserisci un numero tra 1 e 100: ");
+        io::stdout().flush().unwrap();
 
-    // detto questo, cambiamo la stringa ad intero no?
-    // conversione:
 
-    //let input: u32 = input; MA POTREBBE DARE ERRORE! Quindi usiamo le specifiche buone come .trim(), .parse() e .expect("inserisci un tipo di numero!")
-    // per un porse() buono, possiamo fare .parse::<u32>() così che riporti non qualsiasi cosa, ma un tipo a 32 bit.
-    let input: u8 = input.trim().parse::<u8>().expect("inserisci un tipo di numero!");
+        let mut input: String= String::new(); // BISOGNA ASSOLUTAMENTE RIPORTARE LA VARIABILE DA INTERO A STRINGA!!
+        // ALTRIMENTI IL PROGRAMMA NON PUÒ CONVERTIRE INTERI IN INTERI!! SOPRATTUTTO SE È SISTEMATO PER STRINGA!!
+
+
+        io::stdin().read_line(&mut input).unwrap(); 
+
+        let mut input: i32 = input.trim().parse().expect("Errore nella lettura"); // convertiamo da Stringa a intero
+
+        println!("");
+        //let input: u8 = input.trim().parse::<u8>().expect("inserisci un tipo di numero!"); // QUESTO CREA ERRORE SE ITERATO
+
+        match input.cmp(&n) // Devi SEMPRE mettere tutti e 3 i casi.
+        {
+            Ordering::Less => println!("Troppo piccolo"),
+            Ordering::Greater => println!("Troppo grande"),
+            Ordering::Equal => { //Si. Puoi usare una sequenza di istruzione. la funzione match è più comoda di fare diversi "If".
+                println!("Uguale! hai vinto!");
+                break; // NON DIMENTICARE MAI UN ESCAPE CON BREAK!
+            }
+        }
+    }
+
+    // loop { <blocco> }, while <condizione> { <blocco> }, for <variabile> in <iteratore> { <blocco> }. 
 
     /*
-        Quindi in rust è completamente legale ridefinire variabili. Completamente:
-        //...
-        let guess = io::read_line().expect("...");
-        let guess: u32 = guess.trim().parse().expect("...");
-        //...
+        for i in 0..10 {
+            println!("i = {}", i);
+        }
     */
-    match input.cmp(&n) 
+
+    println!("Ecco diversi test di conferma di iterazioni: /n for i in 0..10, vediamo:");
+
+    
+    let mut i = 0;
+
+    for i in 0..10 { //nota, possiamo anche indicare il tipo di intero e obbligarlo con i:i32.
+        println!("i = {}", i);
+    } // va da 0 a 9. Quindi da N(0) a N(i)-1
+
+    println!("while...");
+
+    while  i < 10 
     {
-        Ordering::Less => println!("Troppo piccolo"),
-        Ordering::Equal => println!("Uguale! hai vinto!"),
-        Ordering::Greater => println!("Troppo grande"),
+        println!("i = {}", i);
+        i += 1;
+    } // va da 0 a 9. Quindi da N(0) a N(i)-1
+
+    /*println!("Non stava nemmeno bisogno di usare una nuova variabile e parte da sola anche da 0 senza istanziarla! ora testiamo il do while...");
+
+    do{
+        println!("n = {}", n);
+        n += 1;
+    } while n < 10; */ //il do while non esiste in Rust
+    /* per fare un  Do While, ci tocca ricorrere a fare:
+        
+        while(true)
+        {
+            expression
+            if condition
+            {
+                break;
+            }
+        }
+
+        oppure...
+
+        loop 
+        {
+            do_stuff();
+            if !condition 
+            {
+                break;
+            }
+        }
+
+        o ancora... (da testare sia chiaro)
+
+        while 
+        {
+            do_stuff();
+            condition
+        } {}
+
+        quindi probabilmente in questi usare delle funzioni ecc. e quindi più affidabile la prima situazione e accettabile la seconda.
+    */
+
+    // per gli if la storia si complica. Rust accetta solo booleani.
+
+    if (1<2)
+    {   
+        println!("1<2. Le parentesi non sono obbligatorie");
+    }else
+    {
+        println!("1>2");
     }
+    let o = 2;
+    if o<2
+    {   
+        println!("1<2");
+    }else
+    {
+        println!("1>2... sì, ho copia-incollato per fare un if sbagliato e controllare se si potevano fare i controlli normali.");
+    }
+
+    // risolto il capitolo sulle iterazioni, ricorda solo che If vuole booleani.
+
 }
