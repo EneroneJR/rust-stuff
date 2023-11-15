@@ -1,64 +1,76 @@
-use std::io;
-use std::io::Write;
-// use rand::Rng; qui non serve
+/* se nel use ci servono più rami/path di librerie. come Input e Output, ma anche "Ordering" possiamo fare...
 
-// "use" ci permette di avvisare cosa stiamo importando e di che libreria
-// std::io, stiamo importando la libreria di input/output
-// rand::Rng, stiamo importando la libreria di random
+    use rand::Rng;
+    use std::io;
+    use std::cmp::Ordering;
 
-// ATTENZIONE! LA LIBRERIA rand::Rng è una libreria CHE METTIAMO TRAMITE IL CARGO.TOML!!!
+    Ma personalmente preferirei:
+*/
+use std::{
+    cmp::Ordering,
+    io, // nota che usi dentro le {}, la "," (virgola), non il punto e virgola.
+}; // ricordarti sempre di finire con un ";"
+use rand::Rng;
 
-fn main() // main è il nome del programma ed fn è "funzione"
-{ //gli argomenti non sono passati. se voglio usarli, uso: std::env::args()
+// Ordering è un enumerazione che contiene solo questi 3 valori:
+/*
+enum Ordering {
+    Less,
+    Equal,
+    Greater,
+} minore, uguale e maggiore
 
-    //print!("Inserisci un numero: "); 
-    //sarebbe più corretto usare print, ma ciò provoca l'attesa di un Input, prima di fare il print.
-    // per fare un normale print dobbiamo specificare un pacchetto di std::io... std::io::Write
-    // di conseguenza il codice basilare corretto è:
-    print!("Inserisci un numero: ");
-    io::stdout().flush().unwrap(); //unwrap è quasi un equivalente di .expect(), si può usare infatti al suo posto. flush invece è come readline ecc.
+*/
+fn main() 
+{
+    let mut rng = rand::thread_rng(); // genera una variabile di tipo Rng che si occupa di generare un numero casuale richiamandola con .gen_range("0..N-1")
+    let n = rng.gen_range(1..101); // richiamo la variabilke rng con il metodo .gen_range("1..101") che genera un numero casuale tra 1 a 100
+    let mut input = String::new(); // stringa vuota da riempire con l'input	da indovinare
+    io::stdin().read_line(&mut input).unwrap();
 
-    let mut guess = String::new(); 
-    // let è la dichiarazione di una variabile che non può essere modificata. DEFINISCE UNA VARIABILE
-    // mut rende la variabile modificabile
-    // String è la dichiarazione
-    // new è una funzione che crea una nuova stringa vuota. SOLO STRINGA
-    // La combo String::new(), è una stringa a capienza variabile.
-    // inoltre :: indica che il new è associata al tipo String
-    // altrimenti la variabile avrà il tipo assegnato dal compilatore in automatico.
-    // altrimenti usa: "let mut guess: String = String::new();"
+    // con ordering abbiamo la funzione "match"
+   /*match input.cmp(&n) { // cmp è un abbreviazione di "compare"/"comparare"
+        Ordering::Less => println!("Troppo piccolo"),
+        Ordering::Equal => println!("Uguale! hai vinto!"),
+        Ordering::Greater => println!("Troppo grande"),
+    }*/
+    // problema: input è una stringa e non un numero. Mentre rng è un numero
 
-    io::stdin().read_line(&mut guess).expect("Failed to read line");
-    // read_line è una funzione che legge una riga di input da tastiera
+    // come risolvere?
+    // Rust è capace di comparare non solo gli interi, ma TUTTI gli oggetti che hanno determinati caratteristiche! 
+    // Questo attraverso le "trait", ma questo si approfondisce su un altro programma.
 
-    // si può scrivere anche:
-    /*
-        io::stdin()
-            .read_line(&mut guess)
-            .expect("Failed to read line");    
+    /* Rust ha diversi tipi di intero:
+     i8 ovvero intero col segno a 8 bit: -128 a 127 ( da i8::Min a i8::Max ) SFRUTTA IL COMPLEMENTO A 2!
+     u8 intero senza segno a 8 bit: 0 a 255 ( da 0 a u8::MAX)
+     i16 intero col segno a 16 bit: -32768 a 32767 ( da i16::MIN a i16::MAX )
+     u16 intero senza segno a 16 bit: 0 a 65535 ( da 0 a u16::MAX)
+     i32 intero col segno a 32 bit: -2147483648 a 2147483647 ( da i32::MIN a i32::MAX )
+     u32 intero senza segno a 32 bit: 0 a 4294967295 ( da 0 a u32::MAX)
+     i64 intero col segno a 64 bit: -9223372036854775808 a 9223372036854775807 ( da i64::MIN a i64::MAX )
+     u64 intero senza segno a 64 bit: 0 a 18446744073709551615 ( da 0 a u64::MAX)
+     isize intero con segno, stessa dimensione dei puntatori per l'architettura corrente (usati magari per array)
+     usize intero senza segno, stessa dimensione dei puntatori per l'architettura corrente (usati magari per displacement di array)
     */
 
-    // io.stdin() ritorna un istanza di std::io::Stdin
-    // .read_line(&mut guess) ritorna un istanza di std::io::Result< || Invoca il metodo che legge una riga di input da tastiera>
-    // &mut guess ritorna un istanza di std::io::Result<String>. Crea un errore perchè il compilatore vuole sapere dove và l'input che è pure modificabile.
-    // .expect("Failed to read line") ritorna un istanza di std::io::Result. Gestisce, seppur male, un errore o problemi durante l'uso d stdin
+    // detto questo, cambiamo la stringa ad intero no?
+    // conversione:
 
-    // !!!RUST PASSA PER RIFERIMENTO!!!
+    //let input: u32 = input; MA POTREBBE DARE ERRORE! Quindi usiamo le specifiche buone come .trim(), .parse() e .expect("inserisci un tipo di numero!")
+    // per un porse() buono, possiamo fare .parse::<u32>() così che riporti non qualsiasi cosa, ma un tipo a 32 bit.
+    let input: u8 = input.trim().parse::<u8>().expect("inserisci un tipo di numero!");
 
-    println!("Hai inserito: {}", guess);
-    // il messaggio in uscita è come c: metti un "blank" {} e poi inserisci la variabile
-
+    /*
+        Quindi in rust è completamente legale ridefinire variabili. Completamente:
+        //...
+        let guess = io::read_line().expect("...");
+        let guess: u32 = guess.trim().parse().expect("...");
+        //...
+    */
+    match input.cmp(&n) 
+    {
+        Ordering::Less => println!("Troppo piccolo"),
+        Ordering::Equal => println!("Uguale! hai vinto!"),
+        Ordering::Greater => println!("Troppo grande"),
+    }
 }
-
-// di più su .expect("...") :
-
-/*
-    | std::io::Stdin::readl_line ritorna std::result::Result, per la precisione std::io::Result<usize>
-    | in Rust non esistono eccezioni. I risultati (KO o OK) devono essere esplicitamente gestiti.
-    | se ci dimentichiamo di gestirli, il programma non compila o il compilatore ci dice di farlo.
-    | Result<T, E> è un tipo di dati che rappresenta un risultato di una operazione. Un enumerazione:
-    | T è il risultato OK! quindi andata bene / Ok(T)
-    | E è il risultato KO! quindi andata negativa/ Err(E)
-    | .expect("...") è una funzione che restituisce il risultato di una operazione. In questo caso ritorna il numero di caratteri letti
-    nell'esempio il valore viene ignorato, l'operazione fallisce e fa esplodere il programma (panic) con il messaggio indicato "failed to read line".
-*/
