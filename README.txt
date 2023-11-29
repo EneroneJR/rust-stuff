@@ -1,11 +1,7 @@
-Sistemato un pò i DataType di cui usufruisce Rust...
+CAPITOLO CRUCIALE SU RUST!
 
-ATTENZIONE
-possiamo rendere più leggibili grandi numeri interi, tramite il carattere "_"
-esempio 100000, possiamo scriverlo 100_000
-Possiamo RIDICHIARARE Variabili, immutabili e cambiandone il tipo. esempio:
+L'Ownership è ciò che Rust sfrutta per mantenere capacità eccezionali di memory safe.
 
-let x: i32 = 6;
-let x: String = "Six";
+Ovviamente a livello di scrittura del codice e ragionamento richiederà di più e sicuramente gli esempi saranno cruciali per:
 
-x prima sarà 6 intero e dopo Six stringa
+Scrittura codice, comprensione di come ragionare la struttura del codice stesso, capire il ragionamento del compilatore stesso!
