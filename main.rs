@@ -1,64 +1,153 @@
-use std::fs::File; // con questo permettiamo l'apertura dei filesystem
-use std::io::ErrorKind;	// con questo possiamo gestire gli errori
-use std::io::Read;
-use std::error::Error;
+/*struct Point 
+{
+    x: i32,
+    y: i32,
+}*/
 
-fn main() {
-    // per chiudere il programma con valori errati che non vogliamo, possiamo usare la macro:
-    // panic!("Programma esploso perchè è stato richiamato dal programmatore");
-    // esempio:
+/*struct Point<T>
+{
+    x: T,
+    y: T,
+}*/
 
-    //a();
-
-    let f = File::open("hello.txt");
-
-    let f = match f
-    {
-        Ok(file) => file,
-        //Err(error) => panic!("Problema ad aprire il file: {:?}", error),
-        Err(error) => match error.kind()
-        {
-           ErrorKind::NotFound => match File::create("Hello.txt") // creare un altro file POTREBBE fallire, quindi dobbiamo controllare che vada per bene!
-           {
-                Ok(fc) => fc,
-                Err(e) => panic!("Problema a creare il file: {:?}", e),
-           },
-           other_error =>
-           {
-                panic!("Problema ad aprire il file: {:?}", other_error)
-           }
-        }
-    };
-    //----------------------------------------------------------------
-    // per semplificare il tutto, possiamo usare unwrap, invece di match:
-
-    //let f = File::open("Hello2.txt").unwrap(); //in questo caso farà tutto il codice di match, nel caso Ok prenderà il file, in quello di Err, darà panic!
-
-    // ma abbiamo anche il metodo expect(). Che ci permette di specificare il messaggio di errore!
-    let mut f = File::open("Hello2.txt").expect("Fallito ad aprire Hello2.txt");
-
-    let mut s = String::new();
-
-    f.read_to_string(&mut s); // ci evita tutto il lavoro del match
-    Ok(s);
-
+struct Point<T, U>
+{
+    x: T,
+    y: U,
+}
+//----------------------------------------------------------------
+struct Poin<T>
+{
+    x: T,
+    y: T,
 }
 
-fn a()
+impl<T> Poin<T> // questo metodo sarà disponibile per qualsiasi valore, poichè generico
 {
-    b(22);
-}
-
-fn b(x: i32)
-{
-    if x == 22
+    fn x(&self) -> &T
     {
-        panic!("Non pasare il valore 22");
+        &self.x
     }
 }
 
-fn read_from_file() -> Result<String, io::Error>
+impl Poin<f64> // questo metodo/implementazione è disponibile solo per le variabili f64! Poichè non generico!
 {
-    Fs::read_to_string("HelloP.txt"); //fs sta per FileSystem
-    Ok(())
+    fn y(&self) -> f64{
+        self.y
+    }
 }
+//----------------------------------------------------------------
+
+struct Esem<T, U>
+{
+    x: T,
+    y: U,
+}
+
+impl <T, U> Esem<T, U>
+{
+    fn mixup<V, W>(self, other: Esem<V, W>) -> Esem<T, W>
+    {
+        Esem
+        {
+            x: self.x,
+            y: other.y,
+        }
+    }
+}
+
+fn main() {
+    // funzioni di estrazione
+
+    let number_list = vec![34, 50, 25, 100, 65];
+
+    /*
+    let mut largest = number_list[0];
+
+    for n in number_list
+    {
+        if n > largest
+        {
+            largest = n;
+        }
+    }
+    */
+ // se si seleziona il codice e si preme tasto destro, avremo l'opzione "refactor", che ci permette di creare istantaneamente una funzione
+
+    let largest = piu_grande(number_list);
+
+    println!("Il numero più grande è: {}", largest);
+
+    let parola = vec!['c', 'i', 'a', 'o'];
+
+    let largest = get_largest(parola);
+    println!("La lettera più grande è: {}", largest);
+
+    // ---------------------------------------------------
+    // possiamo usare anche i tipi generici con le strutture.
+
+    let p1 = Point { x: 5, y: 10 };
+    //let p2 = Point {x:5.0, y:10.0}; Come fare? con i tipi generici!
+    let p2 = Point {x:5.0, y:10.0};
+    // let p3 = Point {x:5, y:10.0}; Ma questoi darà errore, Perchè SI, è un tipo generico, Ma NO! non sono dello stesso tipo genrico T!
+    // come risolvere? aggiungiamo un altro tipo generico!
+    let p3 = Point {x:5, y:10.0};
+
+    // ---------------------------------------------------
+    enum Option<T>
+    {
+        Some(T),
+        None,
+    }
+
+    enum Result<T, E>
+    {
+        Ok(T),
+        Err(E),
+    }
+
+    // li capite meglio ora questi no?
+    // ---------------------------------------------------
+
+    let p = Poin { x: 5, y: 10 };
+    p.x();
+    let p1 = Poin { x: 5.0, y: 1.0 };
+    p1.x();
+    p1.y();
+
+    // Diversi esempi di cosa sia possibile fare nel video. (riga 41)
+    let p1 = Esem{ x: 5, y: 10.4};
+    let p2 = Esem{ x: "Hello", y: 'c'};
+
+    let p3 = p1.mixup(p2);
+
+    println!("p3.x = {}, p3.y = {}", p3.x, p3.y);
+
+}
+
+fn piu_grande(number_list: Vec<i32>) -> i32 {
+    let mut largest = number_list[0];
+
+    for n in number_list {
+        if n > largest {
+            largest = n;
+        }
+    }
+    largest
+}
+
+// ma se non vogliamo inserire solo vettori di interi?
+//inseriamo il <T>, come per indicare un tipo generico e...
+fn get_largest<T: PartialOrd + Copy>(number_list: Vec<T>) -> T {
+    let mut largest = number_list[0];
+
+    for n in number_list {
+        if n > largest {
+            largest = n;
+        }
+    }
+    largest
+}
+
+// Solo che T è troppo generico per far funzionare gli operatori booleani. Quindi dobbiamo indicare un range di "Traits", dei "Tratti"
+// (prossimo capitolo)
