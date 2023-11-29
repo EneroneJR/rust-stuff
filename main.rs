@@ -1,154 +1,150 @@
 fn main() {
-    let x: i32 = 6;
-    println!("Il valore di x è {}", x);
+    // Capitolo sulle Ownership. Un argomento per esempio sono lo Stack e l'Heap
+    /*
+    fn main() 
+    {
+        fn a()
+        {
+            let x: &str = "Hello";
+            let y: i32 = 22;
+            b();
+        }
+        fn b()
+        {
+            let x: String = String::from("world");
+        }
+    }
+    */
+    //--------------------------------------------------------
+    // ----- regole di Ownership ------
+    // 1. Ogni valore in Rust ha una variabile chiamata Proprietario.
+    // 2. Ci può essere solo UN proprietario alla volta.
+    // 3. Quando il Proprietario esce fuori dal "focus", portata, il valore viene "Lasciato", cancellato.
+
+    { // s non è valido qui, non è ancora dichiarata
+        let s: &str = "Hello"; // s è valida da adesso in avanti
+        // scrivi codice con s
+    } // adesso usciamo dal focus, finendolo ed s non è più valido
+
+    /*  s nell'esempio però è di tipo finito (ricordare che la stringa è un array di char). Per farla dinamica possiamo fare:
+        let s: String = String::from("Hello");   che è come allocare una memoria dinamica con la funzione "new"
+        quando usciamo dal "focus", viene in automatico/sottinteso che avviene un "delete"
+    */
+
     let x: i32 = 5;
-    println!("il valore di x è {}", x);
-    let x: &str = "Six";                    // LE VARIABILI POSSONO ESSERE RIDICHIARATE, CANCELLANDO QUELLE PRECEDENTI GIÀ DICHIARATE. SI CHIAMA "SHADOWING"
-    println!("Il valore di x è: {}", x); 
+    let y: i32 = x; //Copia
 
-    const ESEMPIO: u32 = 100000; // LE COSTANTI SEMPRE IN MAIUSCOLO
+    let s1: String = String::from("Hello"); // Le stringhe dinamiche sono come un puntatore. Quindi s1, PUNTA la memoria/array dinamico con la stringa.
+    // Quindi s2 copia l'indirizzo di memoria?
+    let s2: String = s1; // Muove, non copia. da adesso. s1 non avrà più il valore o il puntatore che Punta verso la memoria dove è allocata la stringa.
+    // come risolvere?
+    // let s2: String = s1.clone();
 
-    const ESEMPIO2: u32 = 100_000; // I VALORI POSSONO ESSER SCRITTI ANCHE CON "_" PER AIUTARE LA LETTURA DEL NUMERO    
+    // Ora. Ogni elemento semplice, dentro lo stack, viene COPIATO non MOSSO. Mentre gli elementi dentro l'heap (che si accede tramite puntatore)...
+    //...Viene MOSSO non COPIATO.
 
-    //----------------------------------------------------------------
+    let s: String = String::from("hello");
+    prendi_ownership(s); // qui viene presa la proprietà del valore (in origine la funzione si chiamava take_ownership)...
+    //println!("{}", s);                 generando un errore qua, poichè s non ha più niente
 
-    //integers già visti... MA!
+    let x: i32 = 5;
+    crea_copia(x); // qua viene creata una copia del valore, senza creare errori
+    println!("{}", x);
+
+    // ma può succedere anche l'opposto! (le funzioni sopra erano dei comuni print)
+
+    let s1: String = lascia_ownership(); // (in origine la funzione si chiamava gives_ownership) 
+    println!("s1 = {}", s1);
     
-    let a: i32 = 98_222; // Input Decimale
-    let b: i32 = 0xff; // Input Esadecimale
-    let c: i32 = 0o77; // Input Ottale
-    let d: i32 = 0b1111_0000; // Input Binario
-    let e: u8 = b'A'; // Input a Byte(???) (supportato soltanto per u8)
+    let s1 = lascia_ownership();
+    let s2 = String::from("hello");
+    let s3 = prendi_e_lascia_indietro(s2);
+    println!("s1 = {}, s3 = {}", s1, s3);
 
-    let f: u8 = 255; // massimo valore che si può inserire in un U8, poichè numero massimo per l'appunto di 2^8 = 256 (0..255), oltre crea OVERFLOW
-    //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ a volte questo in alcune versioni annulla il valore direttamente o direttamente sottrae 255 per evitare che il programma cada in panico
-    
-    //floating point numbers (Numeri con la virgola)
+    // e se vogliamo usare una variabile senza prenderne l'ownership? Si usano le Reference
+    let s1 = String::from("Basta Hello");
+    let (s2, len) = calcola_lunghezza(s1);
+    println!("La lunghezza di '{}' è {}.", s2, len);
 
-    let f: f64 = 2.0;
-    let g: f32 = 3.0;
+    /*possiamo risolvere una funzione così strana facendo:
+        let len = calcola_lunghezza(s1);
+        println!("La lunghezza di '{}' è {}.", s1, len);
 
-    // OPERAZIONI
-    //addizioni
-    let somma_variabile: i32 = 5 + 10;
-    //sottrazioni
-    let differenza: f64 = 95.5 - 4.3;
-    //moltiplicazioni
-    let prodotto: i32 = 4 * 30;
-    //divisioni
-    let quoziente: f64 = 56.7 / 32.2;
-    //resto
-    let resto: i32 = 43 % 5;
-
-    //booleani
-
-    let t: bool = true;
-    let f: bool = false;
-
-    //caratteri
-
-    let c: char = 'z';
-    let z: char = 'ℤ';
-    let diamante: char = '♦';
-
-    // FUNZIONI! LE TROVATE A RIGA: 128..154
-
-    hello_moon();
-
-    let s = somma(2, 5);
-
-    // -----------------------------
-
-    //controllo del "Flusso", la prima parte, giá fatto. (La parte relativa al controllo degli if e di assegnazione variabili tramite if). Ne riporterò comunque gli esempi.
-
-    let numero: i32 = 5;
-
-    if numero < 10
-    {
-        println!("La prima condizione è vera");
-    }else if numero < 22
-    {
-        println!("Anche la seconda condizione è vera");
-    }else 
-    {
-        println!("La condizione è falsa");
-    }
-
-    let condizione: bool = true;
-    let numero: i32 = if condizione { 5 } else { 6 };
-
-    //possiamo catturare eventuali valori con loop ed esistono 3 tipi di loop (iterazioni) in Rust
-    let mut contatore: i32 = 0;
-
-    /*loop 
-    {
-        contatore += 1;
-
-        if contatore == 10
+        fn calcola_lunghezza(s: String) -> usize
         {
-            break contatore;
+            let lunghezza = s.len(); // len() ritorna la lunghezza di una stringa
+            lunghezza
         }
-    }*/
 
-    let risultato:i32 = loop 
-    {
-        contatore += 1;
+        MA DARÀ ERRORE. Perchè!? Perchè s1, avrà perso la sua ownership!!!
 
-        if contatore == 10
+        come risolvere? tramite "&".
+
+        fn main()
         {
-            break contatore;
+            let s1 = String::from("Basta Hello");
+            let len = calcola_lunghezza(&s1);  ------------------metti la & prima di passare la variabile
+            println!("La lunghezza di '{}' è {}.", s1, len);
         }
-    }; // RICORDA DI USARE la semicolona però. 
+        fn calcola_lunghezza(s: &String) -> usize ---------------metti la & prima di passare il tipo 
+        {
+            let lunghezza = s.len(); // len() ritorna la lunghezza di una stringa
+            lunghezza
+        }
+        
+        Questo si chiama "Prestito", perchè finita la funzione, l'ownership da parte della funzione cessa. 
+        Inoltre ricordate che è come si creasse un puntatore s che punta alla stringa s1 che punta all'effettiva allocazione di memoria della stringa
+        Quindi s, come s1, è IMMUTABILE, non cambiabile!!!
 
-    contatore = 3;
+        Però! Se volete passare un riferimento MUTABILE il discorso CAMBIA!!!
+        let mut s1 ~~~~~~;
+        cambia(&mut s1);
 
-    while contatore != 0
-    {
-        println!("{}!", contatore);
+        fn cambia(s: &mut String)
+        {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
 
-        contatore -= 1;
-    }
+        ATTENZIONE, non possiamo fare più di un prestito alla volta Se la variabile o il prestito è mutabile!
+        1) prestiti immutabili si possono fare quante volte vogliamo. ANCHE CON VARIABILI MUTABILI
+        let mut s1;
+        s2 = &s1;
+        s3 = &s1;
+        2) prestiti mutabili sono errori se prima stava qualsiasi tipo di prestito
+        s4 = &mut s1: <-----ERRORE, prima stanno altri due prestiti
+        3) una volta finiti però i prestiti, possiamo chiedere tranquillamente un prestito mutabile, SE PRIMA NON CE NE SONO ALTRI ATTIVI
 
-    println!("uscito dal while");
+        REGOLE DI RIFERIMENTO
+        1) Ad ogni tempo, puoi avere o un riferimento mutabile OPPURE ogni numero di riferimenti immutabili
 
-    let vettore:[i32; 5] = [10, 20, 30, 40, 50];
+        2) i riferimenti devono sempre esser validi
+    */
 
-    for elemento in vettore.iter() // Non indicate il tipo, lo fa da sè altrimenti errore, non so al momento perchè.
-    {
-        println!("il valore è: {}", elemento);
-    } 
-
-    for num in 1..4
-    {
-        println!("{}!", num);
-    }
-
+    //esistono anche gli slicesm, ma questo sarà per un altro capitolo
 }
 
-//possiamo anche creare delle funzioni fuori dal main!
-
-fn hello_moon() //funzioni scritte sempre in minuscolo
+fn calcola_lunghezza(s: String) -> (String, usize) 
 {
-    println!("Salve Luna!");
+    let lunghezza = s.len(); // len() ritorna la lunghezza di una stringa
+    (s, lunghezza)
 }
 
-// possiamo creare anche funzioni che prendono dentro valori:
-
-fn somma_vuota(x: i32, y: i32)
+fn lascia_ownership() -> String
 {
-    x+y;
-} // ma ricordate che è un tipo VOID! NON RITORNA NULLA! Come risolvere?
+    let una_stringa: String = String::from("Hello");
 
-fn somma(x: i32, y: i32) -> i32 //questo indica il "tipo" della funzione e cosa ritornerà il comando "return"
-{
-    let r: i32 = x + y;
-    println!("La somma è: {}", r);
-    // return r; POSSIAMO USARE RETURN, MA ANCHE NO! IN RUST È IMPLICITO CHE L'ULTIMA ESPRESSIONE SIA IL "RETURN"
-    r // PERÒ DOBBIAMO OMETTERE IL ";" PER FARLO CAPIRE!!!
-    // x=y      È COMUNQUE VALIDO!!!
+    una_stringa
 }
 
-fn somma_ottimizzata(x: i32, y: i32) -> i32
+fn prendi_ownership(una_stringa: String)
 {
-    x+y
+    println!("{}", una_stringa);
+}
+
+fn prendi_e_lascia_indietro(una_stringa: String) -> String
+{
+    una_stringa
+}
+
+fn crea_copia(un_intero: i32)
+{
+    println!("{}", un_intero);
 }
