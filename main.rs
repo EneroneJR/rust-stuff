@@ -1,102 +1,141 @@
-/*enum IpAddr
-{
-    V4,
-    V6,
-}*/
+use unicode_segmentation::UnicodeSegmentation;
+use std::collections::HashMap;
 
-enum IpAddr
-{
-    //V4(String),
-    V4(u8, u8, u8, u8),
-    V6(String),
-}
+fn main() {
 
-// possiamo anche sfruttare un enumeratore per tenere più strutture dati o fare di più!
+    // VETTORI
+    let a = [1, 2, 3]; //ARRAY
+    let mut v: Vec<i32> = Vec::new(); // Vettori (array dinamici)
+    v.push(1);
+    v.push(2);
+    v.push(3);
 
-enum Message
-{
-    Quit,
-    Move { x: i32, y: i32 },
-    Write(String),
-    ChangeColor(i32, i32, i32),
-}
-// Possiamo anche inserirci metodi!
-impl Message
-{
-    fn funzione()
     {
-        println!("Questo è un esempio");
+        let v2 = vec![1, 2, 3]; // è dinamico come a "v"
+    }//uscito dal blocco, v2 ed i suoi elementi verranno eliminati
+
+    let third = &mut v[2]; 
+    println!("Il terzo elemento è {}", third);
+
+    match v.get(20)
+    {
+        Some(third) => println!("il terzo elemento è {}", third),
+        None => println!("Non c'è nessun elemento.")
     }
-}
 
-struct IpAddress
-{
-    kind: IpAddr,
-    address: String,
-}
-
-fn main() 
-{
-    /* Esempio poco pratico di cosa potrebbe fare un Enumeratore
-    let quattro = IpAddr::V4;
-    let sei = ipAddr::V6;
-
-    let localhost = IpAddress
+    enum SpreadsheetCell
     {
-        kind: IpAddr::V4,
-        address: String::from("127.0.0.1"),
+        Int(i32),
+        Float(f64),
+        Text(String),
+    }
+
+    let row = vec!
+    [
+        SpreadsheetCell::Int(3),
+        SpreadsheetCell::Float(10.12),
+        SpreadsheetCell::Text(String::from("blue")),
+    ];
+
+    match &row[1]
+    {
+        SpreadsheetCell::Int(i) => println!("{}", i),
+        _ => println!("Non un Intero!"),
     };
-    */ // Sistemiamo
 
-    // let localhost = IpAddr::V4(String::from("127.0.0.1"));
+    // STRINGHE
+    // le stringhe sono contenute in una collezione di bit codificati in UTF-8
 
-    let localhost = IpAddr::V4(127, 0, 0, 1);
+    let mut s = String::from("foo");
+    s.push_str("bar");
+    s.push('!');
+    // foobar!
 
-    // in Rust non esiste il valore NULL, ma possiamo fare "l'option enum", Enum opzionale:
-/*    enum Option<T>
+    let s1 = String::from("Hello, ");
+    let s2 = String::from("World!");
+    //let s3: String = s1 + &s2; // qua togliamo l'ownership di s1, quindi ci sarà un errore in s1 poichè ora è vuoto!
+    //println!("{}", s1);
+
+    let s3 = format!("{}{}", s1, s2); // la macro format non prende ownership
+
+    let hello: String = String::from("Hello");
+    //let c: char = hello[0]; //questo non può andare bene, perchè UTF-8, 
+    // porta i caratteri a poter arrivare ad essere lunghi fino a 4 bit!,
+    // ad esempio la prima lettera di "Ciao" in russo è di 3 bit lunga! Per un solo carattere!
+
+    // nell'utf-8 esistono 3 tipi di valori:
+
+    // bytes
+
+    println!("Bytes");
+
+    for b in "Ciao".bytes() // non ho una tastiera speciale, ma metteteci qualsiasi parola volete voi, purtroppo i caratteri speciali dei scalari non li ho
     {
-        Some(T),
-        None,
+        println!("{}", b);
     }
-*/ // Questa cosa è così importante che Rust lo ha implentato già da sè!
 
-    let qualche_numero =Some(5);
-    let qualche_stringa = Some("Una stringa");
+    // scalari
 
-    let numero_assente: Option<i32> = None; // nota come nel caso di Some, non abbiamo dovuto implementare il tipo!!!
+    println!("scalari");
 
-    let x: i8 = 5;
-    let y: Option<i8> = Some(5);
-
-    // let sum: <i8 as Add<Option<i8>>>::Outpot = x + y; è un errore perchè i tipi sono diversi, quindi dobbiamo estrarne la variabile.
-    // però e specifico per l'option usata
-    let sum = x + y.unwrap_or(0);
-
-
-}
-
-fn route(ip_kind: IpAddress)
-{
-}
-
-enum Coin
-{
-    Penny,
-    Nickel,
-    Dime,
-    Quarter,
-}
-
-fn valore_in_centesimi(coin: Coin) -> u8
-{
-    match coin
+    for c in "Ciao".chars()
     {
-        Coin::Penny => {
-            println!("Penny fortunato!");
-            50;
-        },  //esempio
-        Coin::Nickel => 5,
-        Coin::Dime => 10,
-        Coin::Quarter => 25,
+        println!("{}", c);
     }
+
+    // grafici
+
+    println!("grafici / 'graphemes' ");
+
+    // Qui non si può fare di norma! Bisogna importare una dependencies in cargo.toml e aggiungendolo (riga 1)
+
+    for g in "Ciao".graphemes(true)
+    {
+        println!("{}", g);
+    }
+
+    // HASHMAPS
+
+    // per usare gli hashmaps ci tocca prima aggiungere dalla libreria std (rigo 2)    
+
+    let blue = String::from("Blue");
+    let yellow = String::from("Yellow"); 
+
+    let mut scores = HashMap::new();
+
+    scores.insert( blue, 10); // ricorda che l'ownership viene passata
+    scores.insert( yellow, 50); // quindi...
+    // println!("{}", blue); non è valido!
+
+    let team_name = String::from("Blue");
+    let score = scores.get(&team_name); // in questo caso abbiamo un option, perchè non possiamo garantire che un valore sarà ritornato!
+
+    for (key, value) in &scores
+    {
+        println!("{}: {}", key, value);
+    }
+
+    let mut punteggi = HashMap::new();
+
+    punteggi.insert(String::from("Blue"), 10);
+    punteggi.insert(String::from("Blue"), 20); //Così SOVRASCRIVIAMO il dato precedente con la chiave 'Blue'
+
+    // come possiamo evitarlo?
+
+    punteggi.entry(String::from("Yellow")).or_insert(30); // se non c'è un valore, o una chiave già esistente con questa chiave, creala ed inserisci 30
+    punteggi.entry(String::from("Yellow")).or_insert(40); // se esiste, non fare niente
+
+    let text = "hello world wonderful world";
+
+    let mut map = HashMap::new();
+
+    // ["hello", "world", "wonderful", "world",]
+    for word in text.split_whitespace()
+    {
+        let count = map.entry(word).or_insert(0); // in questo caso riporta anche un riferimento alla variabile
+        *count += 1; // con * togliamo il riferimento alla variabile ed aggiungiamo un 1 al valore
+    }
+
+    println!("{:?}",map);
+    
 }
