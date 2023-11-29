@@ -1,3 +1,11 @@
-In questo abbiamo un normalissimo guessing game, ma qua ci sarà un aggiunta sul fatto di cambiare colori degli output da terminale!
+Sistemato un pò i DataType di cui usufruisce Rust...
 
-Stava anche la possibilità di mandare output direttamente in numeri, ma per facilità ho convertito in stringa.
+ATTENZIONE
+possiamo rendere più leggibili grandi numeri interi, tramite il carattere "_"
+esempio 100000, possiamo scriverlo 100_000
+Possiamo RIDICHIARARE Variabili, immutabili e cambiandone il tipo. esempio:
+
+let x: i32 = 6;
+let x: String = "Six";
+
+x prima sarà 6 intero e dopo Six stringa
