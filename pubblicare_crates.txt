@@ -98,6 +98,8 @@ name = "art"
 
 /* Potrebbe esserci qualche problema in questi capitoli, si riconsiglia di rivedere la parte del creare una propria lib.rs/crates per capire meglio il meccanismo del perchè avviene ciò. Eventualmente potrà esserci un nuovo file.txt per spiegarne il nesso. Se non fatto, un'oretta di documentazione e studio più approfondito non guasterà */
 
+// edit di piccola ricerca dopo. Spiegato, o almeno provato a spiegare nel file: spiegazione.txt
+
 -----Non puoi ancora fare publish.
 
 Devi mettere una description and license nella sezione [package] in cargo.toml
