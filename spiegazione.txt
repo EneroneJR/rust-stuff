@@ -1,0 +1,16 @@
+Allora. questo avviene in: esempio.
+
+cargo new art.
+
+viene creata la cartella "art" ed il "name" dentro il file cargo.toml sotto [package], sarà lo stesso della cartella.
+
+Il name, indica anche il crates affiancata ad essa! DI BASE IL CODICE È COME SE FOSSE GIÀ UNA LIBRERIA!, quindi se facciamo il file lib.rs, al fianco di del main.rs, quando richiameremo la crates, scriveremo: use art::modulo;
+
+Ciò implica che se il "name", cambia. Anche il richiamo della cartella, cambierà. Ma non è necessario che cambi il nome della cartella del progetto. Esempio:
+
+cartella Art
+  cargo.toml >> name = "Lupin_art"
+
+  main.rs >> use Lupin_art::Fujiko;
+
+  
