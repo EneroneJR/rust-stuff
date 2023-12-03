@@ -1,0 +1,109 @@
+Rust non ottimizza di default le impostazioni.
+
+sul file cargo.toml, però, possiamo direttamente settare il livello di ottimizzazione del codice:
+
+[profile.dev]
+opt-level = 0
+
+[profile.release]
+opt-level = 3
+
+(questi sono i valori di default. Per fare una build release, basta scrivere: cargo build --release. Questo perchè un file compilato con il normale comando "cargo build", sia un programma magari da modificare e quindi da compilare più volte. Il --release si suppone di usarlo nel momento in cui viene rilasciato il file o la "crates". Quindi compilato una sola e ultima volta)
+
+Un altro consiglio sarebbe quello di usare 3 / per i commenti utili a leggere cosa fa effettivamente un programma o codice.
+
+// commento per leggere la logica o che lo sviluppatore lascia anche per divertimento
+
+/// commenta che spiega e fa esempi di cosa farà l'intero codice. Anche perchè può esser estratto come file html/documento vero e proprio (commenti di documentazione). Usa i markdown per la formattazione.
+
+---------
+
+Una cosa molto importante da provare invece può essere: cargo doc --open
+
+cargo doc, apre la DOCUMENTAZIONE della libreria/crates magari che stiamo usando, mentre --open, APRE un browser di essa
+
+La formattazione viene spiegata comunque sul libro di rust, se si vuole effettivamente costruire delle crates, magari da condividere in azienda ecc. Ma possibilmente si dovrebbero creare 3 sezioni oltre che quelle degli esempi:
+
+Panics. (Capitolo poer parlare di alcuni casi in cui la funzione finisce in "panico". Possibilmente gestito da noi)
+
+Errors. (Descrive eventualmente risultati che descrivono errori)
+
+Safety: Se la funzione non è sicura, ci dovrebbe essere una sezione che spieghi perchè, per evitare eventuali problemi
+
+--------MarkDown-------
+
+/// #Examples, crea una sezione nella sezione html dal titolo "esempi". Quindi
+
+/// #Panics
+
+/// #Errors
+
+/// #Safety
+
+/// ```
+/// esempio/test di codice/sezione
+/// ```
+
+---+esempio+---
+//! # Test
+//!
+//! Questo crea un menù stile tendina, è una formattazione in più con cui giocare o commentare ulteriormente la vostra documentazione.
+/// Ricorda che questo comparirà nel file Doc sul browser
+// Questo no!
+
+--------Esportazioni di librerie
+
+basta scrivere nelle librerie un comandino come
+
+pub use self::modulo::enumeratore_specifico;
+pub use self::modulo2::funzione;
+
+Questo crea una nuova sezione chiamata "Re-Exports", dove spiega come richiamare la libreria stessa.
+
+Inoltre fare questo ci permette direttamente di scrivere questo nel codice main:
+
+use libreria::modulo::enumeratore_specifico; (corretto, ma fare l'esempio sopra ci permette di scrivere...)
+
+use libreria::enumeratore_specifico;
+
+--------pubblicare la crates(libreria)
+
+Andare sul sito: www.crates.io
+
+Avere un account GitHub e collegare/registrarsi/accedere
+
+Dopo di chè andare sull'account >>> Api Access >>> Nuovo Token >>> <inserire token> >>> Crea >>> Genera il token, ed ovviamente fare sulla command line >>> cargo login <token>.
+
+Così cargo si collegherà al vostro account su Crates.io! Da cui pubblicare crates.
+
+MA PRIMA!!! Si controlleranno i metadata per seguire determinate regole.
+
+Si va sul file Cargo.toml (della nostra crates che vogliamo pubblicare)
+
+nella sezione [package], assicurarsi che {Il "name", sia UNICO E ORIGINALE!}.
+
+Solo una volta che il nome ecc. siano univoci, potremo fare "cargo publish".
+
+!!!ATTENZIONE!!!
+
+Prima di ciò, ricordate di committare il file su git! Come? ecco:
+
+git commit -am "init" (Ma prima ricordate di settare il vostro account. Ma questo è storia per un capitolo su github)
+
+ULTIMA COSA IMPORTANTE: Ricordate che il "name", in cargo.toml, deve corrispondere al nome della libreria che usiamo in lib.rs
+
+use art;
+
+name = "art"
+
+/* Potrebbe esserci qualche problema in questi capitoli, si riconsiglia di rivedere la parte del creare una propria lib.rs/crates per capire meglio il meccanismo del perchè avviene ciò. Eventualmente potrà esserci un nuovo file.txt per spiegarne il nesso. Se non fatto, un'oretta di documentazione e studio più approfondito non guasterà */
+
+-----Non puoi ancora fare publish.
+
+Devi mettere una description and license nella sezione [package] in cargo.toml
+
+E SOPRATTUTTO VERIFICARE/CERTIFICARE LA MAIL!
+
+E ancora meglio: Non puoi rimuoverlo. Solo aggiornarlo però, solo evitare di farle scaricare facendo:
+
+cargo yank --vers <versione pubblicata o selezionata> (--undo, se vogliamo invece ripermettere che possa essere scaricata di nuovo)
